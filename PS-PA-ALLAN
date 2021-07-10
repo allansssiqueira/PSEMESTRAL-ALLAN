@@ -1,0 +1,174 @@
+#include <iostream>
+#include <stdlib.h>
+#include <stdio.h>
+#include <cmath>
+
+using namespace std;
+
+char opcao;
+int numelementos;
+
+struct tTriangulos
+{
+  float lado1, lado2, lado3;
+  struct reg *prox;
+} t_tTriangulos;
+
+float ld1, ld2, hi, pe, ar;
+
+float hipotenusa (float ld1, float ld2)
+{
+  return sqrt((pow(ld1,2))+(pow(ld2,2)));
+}
+float perimetro (float ld1, float ld2, float hi)
+{
+  return ld1+ld2+hi;
+}
+float area (float ld1, float ld2)
+{
+  return (ld1*ld2)/2;
+}
+
+typedef struct
+{
+  float cateto1, cateto2; 
+} tp_catetos;
+
+float *c1, *c2;
+
+char repetir='s';
+
+int main()
+{
+  while (repetir=='s')
+  {
+  cout << "Voce deseja gravar ou ler o banco de dados? Pressione g ou l: ";
+  cin >> opcao;
+  cout << endl;
+
+  if (opcao=='g')
+  {
+    cout << "Qual o número de elementos que deseja gravar? ";
+    cin >> numelementos;
+
+    int tam;
+    tam=numelementos;
+    c1 = (float*) malloc(tam * sizeof(float));
+    c2 = (float*) malloc(tam * sizeof(float));
+
+    /*if (*c1 == NULL && *c2==NULL)
+    {
+      printf("Memoria insuficiente. Fechando o programa...\n");
+      exit(1);
+      numelementos=0;
+    }*/
+    
+    for (int i=0; i<numelementos; i++)
+    {
+      tTriangulos dados;
+
+      cout << "--------------------" << endl;
+      cout << "Digite o cateto 1 do triangulo retangulo: ";
+      cin >> dados.lado1;
+      c1[i]=dados.lado1;
+  
+      cout << "Digite o cateto 2 do triangulo retangulo: ";
+      cin >> dados.lado2;
+      c2[i]=dados.lado2;
+
+      tp_catetos catetos[]=
+      {
+        {c1[i], c2[i]}
+      };
+    }
+    cout << "--------------------" << endl;
+    
+    tp_catetos catetos[]=
+    {
+      {c1[numelementos], c2[numelementos]}
+    };
+
+    int ret;
+    FILE *arq;
+    char nomearq[]="catetos.txt";
+    arq=fopen(nomearq, "wb");
+    if (arq!=NULL)
+    {
+      ret=fwrite(catetos, sizeof(tp_catetos),numelementos,arq);
+      if (ret==numelementos)
+      {
+        printf("Gravacao %d registros com sucesso\n", ret);
+        cout << "--------------------" << endl;
+      }
+      else
+      {
+        printf("Foram gravados apenas %d elementos\n", ret);
+        fclose(arq);
+      }
+    }
+    else
+    puts("Erro: abertura do arquivo");
+  }
+
+  else if (opcao=='l')
+  {
+    cout << "A leitura do banco de dados eh: ";
+
+    tp_catetos catetos[numelementos];
+    int i, ret;
+    FILE *arq;
+    char nomearq[]= "catetos.txt";
+
+    arq=fopen(nomearq, "rb");
+    if (arq!=NULL)
+    {
+      ret=fread(catetos, sizeof(tp_catetos), numelementos, arq);
+      if (ret==numelementos)
+      {
+        printf("Lidos %d registros com sucesso\n", ret);
+        for (i=0;i<ret;i++)
+          printf("%s %d\n", catetos[i].cateto1, catetos[i].cateto2);
+      }
+      else
+        printf("Foram lidos apenas %d elementos\n", ret);
+        fclose(arq);
+    }
+    else
+      puts("Erro: abertura do arquivo");
+    
+    tTriangulos dados;
+    
+    for (int i=0;i<numelementos;i++)
+    {
+      cout << endl;
+  
+      ld1=c1[i];
+      ld2=c2[i];
+
+      hipotenusa (ld1, ld2);
+      dados.lado3=hipotenusa (ld1, ld2);
+      hi=dados.lado3;
+
+      perimetro (ld1, ld2, hi);
+      pe=perimetro(ld1, ld2, hi);
+
+      area (ld1, ld2);
+      ar=area(ld1, ld2);
+    
+      cout << "Cateto 1 = " << ld1 << endl;
+      cout << "Cateto 2 = " << ld2 << endl;
+      cout << "Perimetro = " << pe << endl;
+      cout << "Area = " << ar << endl;  
+      cout << "Hipotenusa = " << hi << endl;   
+    }
+  }
+  else
+  {
+    cout << "Opcao nao identificada. Reinicie o programa!";
+  }
+
+  cout << "Repetir o processo? Pressione s ou n: " << endl;
+  cin >> repetir;
+  }
+  return 0; 
+}
